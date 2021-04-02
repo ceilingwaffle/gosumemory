@@ -60,7 +60,9 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 //SetupRoutes creates websocket connection
 func SetupRoutes() {
+	fmt.Println("Starting websocket endpoints...")
 	http.HandleFunc("/ws", wsEndpoint)
+	http.HandleFunc("/tcws", wsEndpointTourneyClients)
 }
 
 func enableCors(w *http.ResponseWriter) {
@@ -88,7 +90,7 @@ func HTTPServer() {
 			enableCors(&w)
 		}
 		songsOrigin.ServeHTTP(w, r)
-	});
+	})
 	http.Handle("/Songs/", songsWrapped)
 
 	http.HandleFunc("/json", handler)
