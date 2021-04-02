@@ -24,6 +24,7 @@ var tourneyMenuData []menuD
 var tourneyManagerData tourneyD
 var tourneyGameplayData []gameplayD
 var tourneyAlwaysData []allTimesD
+var tourneyClientsInjected int
 
 var menuData menuD
 var songsFolderData songsFolderD
@@ -143,13 +144,46 @@ func initBase() error {
 	fmt.Println(fmt.Sprintf("Initialization complete, you can now visit http://%s or add it as a browser source in OBS", config.Config["serverip"]))
 	DynamicAddresses.IsReady = true
 	if cast.ToBool(config.Config["enabled"]) {
-		err = injctr.Injct(process.Pid())
-		if err != nil {
-			log.Printf("Failed to inject into osu's process, in game overlay will be unavailabe. %e\n", err)
+
+		if menuData.PreSongSelectData.Status == 22 || len(allProcs) > 1 {
+			fmt.Println("[MEMORY] Operating in tournament mode!")
+			tourneyProcs, tourneyErr = resolveTourneyClients(allProcs)
+			if tourneyErr != nil {
+				return err
+			}
+			for i := range tourneyProcs { // i, proc
+				injectNextTourneyProc()
+				fmt.Println(i)
+			}
 		}
+
 	} else {
 		fmt.Println("[MEMORY] In-Game overlay is disabled, but could be enabled in config.ini!")
 	}
 
 	return nil
+}
+
+func injectTourneyProc(proc mem.Process) error {
+	var err error = injctr.Injct(proc.Pid())
+	if err != nil {
+		log.Printf("Failed to inject into osu's process, in game overlay will be unavailabe. %e\n", err)
+		return err
+	}
+	incrementTcidsInjected()
+	return nil
+}
+
+func injectNextTourneyProc() error {
+	var nextTourneyProc = tourneyProcs[tourneyClientsInjected]
+	var err error = injectTourneyProc(nextTourneyProc)
+	if err != nil {
+		log.Printf("Failed to inject into osu's process, in game overlay will be unavailabe. %e\n", err)
+		return err
+	}
+	return err
+}
+
+func incrementTcidsInjected() {
+	tourneyClientsInjected++
 }

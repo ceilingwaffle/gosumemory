@@ -13,6 +13,7 @@
             "showGlobalVariables": true,
             "program": "${workspaceFolder}/main.go",
             "env": {},
+            "output": ".\\bin\\gosumemory.exe",
             "args": []
         }
     ]
