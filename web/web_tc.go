@@ -43,16 +43,17 @@ func wsEndpointTourneyClients(w http.ResponseWriter, r *http.Request) {
 				PID:  latestInjectedTourneyProc.PROC.Pid(),
 				TCID: latestInjectedTourneyProc.TCID,
 			}
-			// connectedTourneyClients = append(connectedTourneyClients, m)
-			if len(memory.InjectedTourneyProcs) >= len(memory.TourneyProcs) { // TODO: replace this with: if memory.TourneyProcs.contains(connectedTourneyClients.PID)
-				// all TC's now have overlays injected; do not attempt to inject more
-				continue
-			}
+			fmt.Println(tcdata)
 			// tcMessageJsonByte, err := json.Marshal(tcdata)
 			// ws.WriteMessage(1, tcMessageJsonByte)
 			err = ws.WriteJSON(tcdata)
 			if err != nil {
 				fmt.Println(err.Error())
+			}
+
+			if len(memory.InjectedTourneyProcs) >= len(memory.TourneyProcs) { // TODO: replace this with: if memory.TourneyProcs.contains(connectedTourneyClients.PID)
+				// all TC's now have overlays injected; do not attempt to inject more
+				continue
 			}
 			_, _, err = memory.InjectNextTourneyProc()
 			if err != nil {

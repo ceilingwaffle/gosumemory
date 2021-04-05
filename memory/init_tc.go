@@ -18,12 +18,6 @@ var TourneyProcs []mem.Process
 func initTourneyClientOverlayInjection(tourneyProcs []mem.Process) {
 	TourneyProcs = make([]mem.Process, len(tourneyProcs))
 	InjectNextTourneyProc()
-	// for {
-	// time.Sleep(1 * time.Second)
-	// if len(InjectedTourneyProcs) >= len(TourneyProcs) {
-	// 	break
-	// }
-	// }
 }
 
 func InjectNextTourneyProc() (int, int, error) {
