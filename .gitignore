@@ -2,7 +2,6 @@ main
 gosumemory
 gosumemory.exe
 gameoverlay
-static
 osu!.db
 config.ini
 __debug_bin

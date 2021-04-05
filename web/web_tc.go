@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -15,8 +14,6 @@ type wsTourneyClientMessage struct {
 	TCID int    `json:"tcid"` // tourney client ID
 	PID  int    `json:"pid"`  // tourney client process ID
 }
-
-// var connectedTourneyClients []wsTourneyClientMessage
 
 func wsEndpointTourneyClients(w http.ResponseWriter, r *http.Request) {
 	if cast.ToBool(config.Config["cors"]) {
@@ -32,7 +29,7 @@ func wsEndpointTourneyClients(w http.ResponseWriter, r *http.Request) {
 		m := wsTourneyClientMessage{}
 		err = ws.ReadJSON(&m)
 		if err != nil {
-			fmt.Println("Error reading json.", err)
+			log.Println("Error reading json.", err)
 		}
 		log.Printf("Received TC message: %#v\n", m)
 		if m.MID == "connected" {
@@ -43,21 +40,19 @@ func wsEndpointTourneyClients(w http.ResponseWriter, r *http.Request) {
 				PID:  latestInjectedTourneyProc.PROC.Pid(),
 				TCID: latestInjectedTourneyProc.TCID,
 			}
-			fmt.Println(tcdata)
-			// tcMessageJsonByte, err := json.Marshal(tcdata)
-			// ws.WriteMessage(1, tcMessageJsonByte)
 			err = ws.WriteJSON(tcdata)
 			if err != nil {
-				fmt.Println(err.Error())
+				log.Println(err.Error())
 			}
 
-			if len(memory.InjectedTourneyProcs) >= len(memory.TourneyProcs) { // TODO: replace this with: if memory.TourneyProcs.contains(connectedTourneyClients.PID)
+			// TODO: replace this with: if memory.TourneyProcs.contains(connectedTourneyClients.PID)
+			if len(memory.InjectedTourneyProcs) >= len(memory.TourneyProcs) {
 				// all TC's now have overlays injected; do not attempt to inject more
 				continue
 			}
 			_, _, err = memory.InjectNextTourneyProc()
 			if err != nil {
-				fmt.Println("Error injecting tourney proc.", err)
+				log.Println("Error injecting tourney proc.", err)
 			}
 		}
 	}
